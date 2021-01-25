@@ -74,7 +74,7 @@ void TrafficLight::cycleThroughPhases()
 
         if (timeSinceLastUpdate >= distr(randomNum))
         {
-            _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLight::green : TrafficLight::red;
+            _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLightPhase::green : TrafficLightPhase::red;
             randomNum = std::mt19937(std::random_device{}());
             lastUpdate = std::chrono::system_clock::now();
         }

@@ -97,9 +97,9 @@ void TrafficLight::cycleThroughPhases()
         {
             _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLightPhase::green : TrafficLightPhase::red;
 
-            std::string color = (_currentPhase == TrafficLightPhase) ? "red" : "green";
+            std::string color = (_currentPhase == TrafficLightPhase::red) ? "red" : "green";
             uLock.lock();
-            std::cout << "Thread #" << std::this_thread::get_id() << " has changed to color " << color "." << std::endl;
+            std::cout << "Thread #" << std::this_thread::get_id() << " has changed to color " << color << "." << std::endl;
             uLock.unlock();
 
             _queue.send(std::move(_currentPhase));

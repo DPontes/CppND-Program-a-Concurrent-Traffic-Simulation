@@ -12,11 +12,10 @@ T MessageQueue<T>::receive()
     // The received object should then be returned by the receive function. 
     std::unique_lock uLock(_mutex);
 
-    if(_messages.empty())
-        _cond.wait(uLock);
+    _cond.wait(uLock, [this] {return !_messages.empty(); });
 
-    T msg = std::move(_messages.front());
-    _messages.pop_front();
+    T msg = std::move(_messages.back());
+    _messages.clear();
 
     return msg;
 }
@@ -77,10 +76,6 @@ void TrafficLight::cycleThroughPhases()
     std::uniform_real_distribution<> distr(4000.0, 6000.0);
     double timeToWait = distr(randomNum);
 
-    std::unique_lock<std::mutex> uLock(_mutex);
-    std::cout << "Thread #" << std::this_thread::get_id() << " has to wait for: " << timeToWait << "ms." << std::endl;
-    uLock.unlock();
-
     // Init stopwatch
     auto lastUpdate = std::chrono::system_clock::now();
 
@@ -96,11 +91,6 @@ void TrafficLight::cycleThroughPhases()
         if (timeSinceLastUpdate >= timeToWait)
         {
             _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLightPhase::green : TrafficLightPhase::red;
-
-            std::string color = (_currentPhase == TrafficLightPhase::red) ? "red" : "green";
-            uLock.lock();
-            std::cout << "Thread #" << std::this_thread::get_id() << " has changed to color " << color << "." << std::endl;
-            uLock.unlock();
 
             _queue.send(std::move(_currentPhase));
             randomNum = std::mt19937(std::random_device{}());
